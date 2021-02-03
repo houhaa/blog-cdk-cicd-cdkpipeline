@@ -24,11 +24,9 @@ export class CicdInfraStack extends cdk.Stack {
         actionName: 'DownloadSources',
 
         // NOTE: Specify your source repository here.
-        owner: 'binxio',
+        owner: 'houhaa',
         repo: 'blog-cdk-cicd-cdkpipeline',
-        oauthToken: cdk.SecretValue.secretsManager('/github.com/binxio', {
-          jsonField: 'token'
-        }),
+        oauthToken: cdk.SecretValue.secretsManager('arn:aws:secretsmanager:eu-west-1:822242914934:secret:github/oauth/token-l1KsFM'),
         output: sourceArtifact,
       }),
 
@@ -42,13 +40,14 @@ export class CicdInfraStack extends cdk.Stack {
     // Build and Publish application artifacts
     const repository = new ecr.Repository(this, 'Repository', {
       repositoryName: 'cdk-cicd/app',
+      removalPolicy: cdk.RemovalPolicy.DESTROY
     });
 
     const buildRole = new iam.Role(this, 'DockerBuildRole', {
       assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com'),
     });
     repository.grantPullPush(buildRole);
-    
+
     const buildStage = pipeline.addStage('AppBuild')
     buildStage.addActions(new codepipeline_actions.CodeBuildAction({
       actionName: 'DockerBuild',
@@ -64,7 +63,7 @@ export class CicdInfraStack extends cdk.Stack {
     }));
 
     // Deploy - Local
-    const localStage = new LocalDeploymentStage(this, 'AppDeployLocal');
+    const localStage = new LocalDeploymentStage(this, 'AppDeployLocal', props);
     pipeline.addApplicationStage(localStage);
   }
 
