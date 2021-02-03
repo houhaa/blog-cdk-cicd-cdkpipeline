@@ -9,7 +9,7 @@ export class ServiceStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const vpc = ec2.Vpc.fromLookup(this, 'VPC', { vpcId: 'vpc-01e4778b53c2a8282' });;
+    const vpc = ec2.Vpc.fromLookup(this, 'MyVpc', { vpcId: 'vpc-01e4778b53c2a8282' });;
 
     const repository = ecr.Repository.fromRepositoryName(this, 'Repository', 'cdk-cicd/app');
     const imageTag = process.env.CODEBUILD_RESOLVED_SOURCE_VERSION || 'local';
